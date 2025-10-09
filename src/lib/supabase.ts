@@ -20,21 +20,49 @@ export const supabase = isValidUrl && isValidKey
   ? createClient<Database>(supabaseUrl, supabaseAnonKey)
   : null;
 
-// Simple authentication - no Supabase auth needed
-const ADMIN_PHONE = '6361064550';
-const ADMIN_OTP = '664477';
-
+// Auth helper functions
 export const signInWithOTP = async (phone: string) => {
-  return { success: phone === ADMIN_PHONE };
+  if (!supabase) return { success: false, error: 'Supabase not configured' };
+
+  // Check if phone is authorized
+  if (phone !== '6361064550') {
+    return { success: false, error: 'Unauthorized phone number' };
+  }
+
+  // Send OTP via Supabase Auth
+  const { error } = await supabase.auth.signInWithOtp({
+    phone: phone,
+  });
+
+  if (error) {
+    console.error('OTP send error:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
 };
 
 export const verifyOTP = async (phone: string, otp: string) => {
-  if (phone === ADMIN_PHONE && otp === ADMIN_OTP) {
-    return { success: true, data: { user: { id: 'demo-admin' } }, error: null };
+  if (!supabase) return { success: false, error: 'Supabase not configured' };
+
+  // Verify OTP with Supabase Auth
+  const { data, error } = await supabase.auth.verifyOtp({
+    phone: phone,
+    token: otp,
+    type: 'sms'
+  });
+
+  if (error) {
+    console.error('OTP verification error:', error);
+    return { success: false, error: error.message };
   }
-  return { success: false, error: { message: 'Invalid OTP' } };
+
+  return { success: true, data, error: null };
 };
 
 export const signOut = async () => {
-  return { success: true };
+  if (!supabase) return { success: false, error: 'Supabase not configured' };
+  
+  const { error } = await supabase.auth.signOut();
+  return { success: !error, error };
 };
