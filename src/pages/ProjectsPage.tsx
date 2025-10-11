@@ -1,8 +1,9 @@
-import React from 'react';
-import { Search, Plus, Code2, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Plus, Code2, TrendingUp, Lightbulb } from 'lucide-react';
 import { ProjectCard } from '../components/ProjectCard';
 import { SearchBar } from '../components/SearchBar';
 import { Project } from '../types';
+import { CustomProjectModal } from '../components/CustomProjectModal';
 
 interface ProjectsPageProps {
   projects: Project[];
@@ -43,6 +44,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   onDeleteProject,
   onAddProject
 }) => {
+  const [isCustomProjectModalOpen, setIsCustomProjectModalOpen] = useState(false);
   const categories = ['Web Development', 'Mobile App', 'AI/ML', 'Blockchain', 'Computer Vision', 'Cyber Security', 'Others'];
   const featuredProjects = projects.filter(p => p.featured);
 
@@ -114,16 +116,26 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
               </div>
               
               {/* Add Project Button for Admins */}
-              {isAuthenticated && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {isAuthenticated && (
+                  <button
+                    type="button"
+                    onClick={onAddProject}
+                    className="flex items-center justify-center space-x-2 px-6 py-4 bg-black border border-gray-600 text-white rounded-xl hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 touch-manipulation"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span className="font-medium">Add New Project</span>
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={onAddProject}
-                  className="w-full flex items-center justify-center space-x-2 px-6 py-4 bg-black border border-gray-600 text-white rounded-xl hover:bg-gray-900 transition-all duration-300 transform hover:scale-105 touch-manipulation"
+                  onClick={() => setIsCustomProjectModalOpen(true)}
+                  className="flex items-center justify-center space-x-2 px-6 py-4 glass border border-gray-600 text-white rounded-xl hover:bg-white/10 transition-all duration-300 transform hover:scale-105 touch-manipulation"
                 >
-                  <Plus className="w-5 h-5" />
-                  <span className="font-medium">Add New Project</span>
+                  <Lightbulb className="w-5 h-5" />
+                  <span className="font-medium">Share Your Idea</span>
                 </button>
-              )}
+              </div>
             </div>
           </div>
         </section>
@@ -260,6 +272,11 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
           </section>
         )}
       </div>
+
+      <CustomProjectModal
+        isOpen={isCustomProjectModalOpen}
+        onClose={() => setIsCustomProjectModalOpen(false)}
+      />
     </div>
   );
 };

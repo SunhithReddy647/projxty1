@@ -1,6 +1,7 @@
-import React from 'react';
-import { TrendingUp, Star, Sparkles, Play, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { TrendingUp, Star, Sparkles, Play, ArrowRight, Lightbulb } from 'lucide-react';
 import { Project } from '../types';
+import { CustomProjectModal } from '../components/CustomProjectModal';
 
 interface HomePageProps {
   projects: Project[];
@@ -15,8 +16,9 @@ export const HomePage: React.FC<HomePageProps> = ({
   onProjectClick,
   onShareProject
 }) => {
+  const [isCustomProjectModalOpen, setIsCustomProjectModalOpen] = useState(false);
   const featuredProjects = projects.filter(p => p.featured).slice(0, 3);
-  
+
   const stats = {
     total: projects.length,
     featured: projects.filter(p => p.featured).length,
@@ -49,13 +51,13 @@ export const HomePage: React.FC<HomePageProps> = ({
                   Explore Projects
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </button>
-                
+
                 <button
-                  onClick={onNavigateToProjects}
+                  onClick={() => setIsCustomProjectModalOpen(true)}
                   className="group glass border border-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3"
                 >
-                  <TrendingUp className="w-5 h-5" />
-                  View All {stats.total} Projects
+                  <Lightbulb className="w-5 h-5" />
+                  Custom Project
                 </button>
               </div>
             </div>
@@ -154,6 +156,11 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         </section>
       )}
+
+      <CustomProjectModal
+        isOpen={isCustomProjectModalOpen}
+        onClose={() => setIsCustomProjectModalOpen(false)}
+      />
     </div>
   );
 };
