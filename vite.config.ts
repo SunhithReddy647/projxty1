@@ -15,6 +15,8 @@ export default defineConfig({
           ui: ['lucide-react']
         }
       }
-    }
+    },
+    cssMinify: true,
+    minify: 'esbuild'
   }
 });
