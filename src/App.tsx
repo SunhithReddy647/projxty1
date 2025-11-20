@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Code2, Users, Star, TrendingUp, LogOut, Lock, User, Phone, X, Shield, MessageCircle, Sparkles, Menu, Home, Info, Briefcase, FolderOpen, Mail } from 'lucide-react';
-import { ProjectCard } from './components/ProjectCard';
+import { Code2, LogOut, Lock, Shield, MessageCircle, Menu, X } from 'lucide-react';
 import { ProjectUpload } from './components/ProjectUpload';
 import { ProjectDetailModal } from './components/ProjectDetailModal';
 import { ShareModal } from './components/ShareModal';
-import { SearchBar } from './components/SearchBar';
-import { HomePage } from './pages/HomePage';
-import { AboutPage } from './pages/AboutPage';
-import { ServicesPage } from './pages/ServicesPage';
 import { ProjectsPage } from './pages/ProjectsPage';
-import { ContactPage } from './pages/ContactPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { Project } from './types';
 import { useProjects } from './hooks/useProjects';
@@ -17,24 +11,22 @@ import { useSearch } from './hooks/useSearch';
 import { useDebounce } from './hooks/useDebounce';
 import { signOut } from './lib/supabase';
 
-type Page = 'home' | 'about' | 'services' | 'projects' | 'contact' | 'admin';
+type Page = 'projects' | 'admin';
 
 function App() {
   const { projects, loading, error, addProject, updateProject, deleteProject } = useProjects();
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [currentPage, setCurrentPage] = useState<Page>('projects');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  
-  // Debounce search term for better performance
+
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  
-  // Use intelligent search hook
+
   const { searchResults, isSearching, searchStats } = useSearch({
     projects,
     searchTerm: debouncedSearchTerm,
     selectedCategory
   });
-  
+
   const [showUpload, setShowUpload] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -43,43 +35,25 @@ function App() {
   const [sharingProject, setSharingProject] = useState<Project | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  
-  // Header scroll state
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-
-  // Navigation items
-  const navigationItems = [
-    { id: 'about', label: 'About', icon: Info },
-    { id: 'services', label: 'Services', icon: Briefcase },
-    { id: 'projects', label: 'Projects', icon: FolderOpen },
-    { id: 'contact', label: 'Contact', icon: Mail },
-  ];
-
-  // Handle scroll for header visibility
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
-      // Show header when at top of page
+
       if (currentScrollY < 10) {
         setIsHeaderVisible(true);
-      }
-      // Hide header when scrolling down, show when scrolling up
-      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down & past threshold
+      } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
         setIsHeaderVisible(false);
-        setShowMobileMenu(false); // Close mobile menu when hiding header
+        setShowMobileMenu(false);
       } else if (currentScrollY < lastScrollY) {
-        // Scrolling up
         setIsHeaderVisible(true);
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
-    // Throttle scroll events for better performance
     let ticking = false;
     const throttledHandleScroll = () => {
       if (!ticking) {
@@ -94,14 +68,13 @@ function App() {
     window.addEventListener('scroll', throttledHandleScroll, { passive: true });
     return () => window.removeEventListener('scroll', throttledHandleScroll);
   }, [lastScrollY]);
-  // Check authentication status on mount
+
   useEffect(() => {
     const authStatus = localStorage.getItem('devcode_auth');
     if (authStatus === 'authenticated') {
       setIsAuthenticated(true);
     }
 
-    // Check for shared project in URL
     const urlParams = new URLSearchParams(window.location.search);
     const sharedProjectId = urlParams.get('project');
     if (sharedProjectId && projects.length > 0) {
@@ -109,7 +82,6 @@ function App() {
       if (sharedProject) {
         setSelectedProject(sharedProject);
         setShowProjectDetail(true);
-        setCurrentPage('projects');
       }
     }
   }, [projects]);
@@ -152,7 +124,6 @@ function App() {
     setShowShare(true);
   };
 
-
   const handleLogout = async () => {
     await signOut();
     setIsAuthenticated(false);
@@ -160,24 +131,12 @@ function App() {
     setShowMobileMenu(false);
   };
 
-
   const handleNavigate = (page: Page) => {
     setCurrentPage(page);
     setShowMobileMenu(false);
-    // Scroll to top of page
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Update URL without page reload
-    window.history.pushState({}, '', page === 'home' ? '/' : `/${page}`);
   };
 
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path === '/admin') {
-      setCurrentPage('admin');
-    }
-  }, []);
-
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen animated-bg flex items-center justify-center relative overflow-hidden">
@@ -185,7 +144,7 @@ function App() {
           <div className="floating-element absolute top-20 left-4 w-20 h-20 bg-white/5 rounded-full blur-xl sm:w-32 sm:h-32 sm:left-10"></div>
           <div className="floating-element absolute top-40 right-4 w-32 h-32 bg-gray-500/10 rounded-full blur-xl sm:w-48 sm:h-48 sm:right-20" style={{ animationDelay: '2s' }}></div>
         </div>
-        
+
         <div className="text-center z-10 px-4">
           <div className="premium-loader mb-6">
             <div className="loader-ring"></div>
@@ -194,7 +153,7 @@ function App() {
               <Code2 className="w-6 h-6 text-white sm:w-8 sm:h-8" />
             </div>
           </div>
-          
+
           <div className="space-y-3">
             <h2 className="text-2xl sm:text-3xl font-bold text-white neon-glow fade-in-up">
               projxty
@@ -202,37 +161,22 @@ function App() {
             <p className="text-base sm:text-lg text-white/80 fade-in-up" style={{ animationDelay: '0.3s' }}>
               Loading amazing projects...
             </p>
-            <div className="flex justify-center space-x-2 fade-in-up" style={{ animationDelay: '0.6s' }}>
-              <div className="loading-dot"></div>
-              <div className="loading-dot" style={{ animationDelay: '0.2s' }}></div>
-              <div className="loading-dot" style={{ animationDelay: '0.4s' }}></div>
-            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="text-center bg-white/90 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-red-200 max-w-md w-full">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-lg w-fit mx-auto mb-4">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-lg w-fit mx-auto mb-4">
             <Code2 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </div>
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Database Connection Required</h2>
           <p className="text-red-600 mb-4 text-sm sm:text-base">{error}</p>
-          <p className="text-gray-600 text-xs sm:text-sm mb-6">Click the "Connect to Supabase" button in the top-right corner to enable database functionality.</p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
-            <h3 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">What you'll get with Supabase:</h3>
-            <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
-              <li>• Projects persist after page refresh</li>
-              <li>• Real-time updates across devices</li>
-              <li>• Secure admin authentication</li>
-              <li>• Scalable to 100+ projects</li>
-            </ul>
-          </div>
+          <p className="text-gray-600 text-xs sm:text-sm mb-6">Click the "Connect to Supabase" button to enable database functionality.</p>
         </div>
       </div>
     );
@@ -240,22 +184,19 @@ function App() {
 
   return (
     <div className="min-h-screen animated-bg relative overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="floating-element absolute top-20 left-4 w-20 h-20 bg-white/5 rounded-full blur-xl sm:w-32 sm:h-32 sm:left-10"></div>
         <div className="floating-element absolute top-40 right-4 w-32 h-32 bg-gray-500/10 rounded-full blur-xl sm:w-48 sm:h-48 sm:right-20" style={{ animationDelay: '2s' }}></div>
         <div className="floating-element absolute bottom-32 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl sm:w-40 sm:h-40" style={{ animationDelay: '4s' }}></div>
       </div>
 
-      {/* Navigation Header */}
       <header className={`glass border-b border-gray-700 fixed top-0 left-0 right-0 z-40 backdrop-blur-xl transition-transform duration-300 ease-in-out ${
         isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 sm:h-20">
-            {/* Logo - Clickable */}
             <button
-              onClick={() => handleNavigate('home')}
+              onClick={() => handleNavigate('projects')}
               className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-300"
             >
               <div className="bg-black border border-gray-600 p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-lg">
@@ -266,29 +207,7 @@ function App() {
               </h1>
             </button>
 
-            {/* Desktop Navigation - Moved to Right */}
-            <div className="flex items-center space-x-8">
-              <nav className="hidden lg:flex items-center space-x-8">
-                {navigationItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleNavigate(item.id as Page)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                        currentPage === item.id
-                          ? 'bg-white text-black font-semibold'
-                          : 'text-gray-300 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-
-              {/* Admin Status */}
+            <div className="flex items-center space-x-4">
               {isAuthenticated && (
                 <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium glass text-gray-300 border border-gray-600">
                   <Shield className="w-3 h-3" />
@@ -296,8 +215,16 @@ function App() {
                 </div>
               )}
 
-              {/* Desktop Auth */}
               <div className="hidden sm:flex items-center space-x-3">
+                {!isAuthenticated && currentPage === 'projects' && (
+                  <button
+                    onClick={() => handleNavigate('admin')}
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-300 hover:text-white transition-all duration-300 glass rounded-lg hover:bg-white/10"
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span className="text-sm">Admin</span>
+                  </button>
+                )}
                 {isAuthenticated && (
                   <button
                     onClick={handleLogout}
@@ -309,39 +236,27 @@ function App() {
                 )}
               </div>
 
-              {/* Mobile Menu Button */}
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="lg:hidden p-2 bg-black border border-gray-600 text-white rounded-lg hover:bg-gray-900 transition-all duration-300"
               >
-                <Menu className="w-5 h-5" />
+                {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
-          
-          {/* Mobile Menu */}
+
           {showMobileMenu && isHeaderVisible && (
             <div className="lg:hidden border-t border-gray-700 py-4 space-y-2">
-              {/* Navigation Items */}
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavigate(item.id as Page)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-                      currentPage === item.id
-                        ? 'bg-white text-black font-semibold'
-                        : 'text-gray-300 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-              
-              {/* Mobile Auth */}
+              {!isAuthenticated && currentPage === 'projects' && (
+                <button
+                  onClick={() => handleNavigate('admin')}
+                  className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white transition-all duration-300 glass rounded-lg hover:bg-white/10"
+                >
+                  <Lock className="w-5 h-5" />
+                  <span>Admin Login</span>
+                </button>
+              )}
+
               {isAuthenticated && (
                 <div className="pt-4 border-t border-gray-700">
                   <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 mb-2">
@@ -362,29 +277,16 @@ function App() {
         </div>
       </header>
 
-      {/* Page Content */}
       <main className="relative pt-16 sm:pt-20">
         {currentPage === 'admin' ? (
           <AdminLoginPage
             onLoginSuccess={() => {
               setIsAuthenticated(true);
-              handleNavigate('home');
+              handleNavigate('projects');
             }}
-            onBack={() => handleNavigate('home')}
+            onBack={() => handleNavigate('projects')}
           />
         ) : (
-          <>
-            {currentPage === 'home' && (
-              <HomePage
-                projects={projects}
-                onNavigateToProjects={() => handleNavigate('projects')}
-                onProjectClick={handleProjectClick}
-                onShareProject={handleShareProject}
-              />
-            )}
-            {currentPage === 'about' && <AboutPage />}
-            {currentPage === 'services' && <ServicesPage />}
-            {currentPage === 'projects' && (
           <ProjectsPage
             projects={searchResults}
             loading={loading}
@@ -409,35 +311,26 @@ function App() {
             }}
           />
         )}
-            {currentPage === 'contact' && <ContactPage />}
-          </>
-        )}
       </main>
 
-      {/* WhatsApp Contact Button */}
-<div className="fixed bottom-4 right-4 z-50 flex flex-col items-center space-y-2">
-  {/* Animated Text */}
-  <div className="relative h-6 overflow-hidden">
-    <span className="absolute animate-pingText text-white text-sm font-medium">Ping me</span>
-    <span className="absolute animate-pingText text-white text-sm font-medium" style={{ animationDelay: '2s' }}>DM me</span>
-    <span className="absolute animate-pingText text-white text-sm font-medium" style={{ animationDelay: '4s' }}>Message me</span>
-  </div>
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-center space-y-2">
+        <div className="relative h-6 overflow-hidden">
+          <span className="absolute animate-pingText text-white text-sm font-medium">Ping me</span>
+          <span className="absolute animate-pingText text-white text-sm font-medium" style={{ animationDelay: '2s' }}>DM me</span>
+          <span className="absolute animate-pingText text-white text-sm font-medium" style={{ animationDelay: '4s' }}>Message me</span>
+        </div>
 
-  {/* WhatsApp Button */}
-  <a
-    href="https://wa.me/916361064550?text=Hi! I'm interested in your projects and would like to connect."
-    target="_blank"
-    rel="noopener noreferrer"
-    className="group flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 touch-manipulation"
-    title="Contact on WhatsApp"
-  >
-    <MessageCircle className="w-6 h-6" />
-  </a>
-</div>
+        <a
+          href="https://wa.me/916361064550?text=Hi! I'm interested in your projects and would like to connect."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 touch-manipulation"
+          title="Contact on WhatsApp"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </a>
+      </div>
 
-
-
-      {/* Project Upload Modal */}
       {showUpload && (
         <ProjectUpload
           isOpen={showUpload}
@@ -450,7 +343,6 @@ function App() {
         />
       )}
 
-      {/* Project Detail Modal */}
       <ProjectDetailModal
         project={selectedProject}
         isOpen={showProjectDetail}
@@ -462,7 +354,6 @@ function App() {
         isAdmin={isAuthenticated}
       />
 
-      {/* Share Modal */}
       <ShareModal
         project={sharingProject}
         isOpen={showShare}
@@ -471,7 +362,6 @@ function App() {
           setSharingProject(null);
         }}
       />
-
     </div>
   );
 }
