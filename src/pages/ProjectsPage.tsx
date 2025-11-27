@@ -63,6 +63,25 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
             </p>
           </div>
         </section>
+         {/* Project Stats */}
+        {projects.length > 0 && (
+          <section className="mt-16 pt-16 border-t border-gray-700">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+              <div className="slide-in glass rounded-xl p-6 border border-gray-600">
+                <h4 className="text-3xl font-bold text-white mb-2">{projects.length}</h4>
+                <p className="text-gray-300">Total Projects</p>
+              </div>
+              <div className="slide-in glass rounded-xl p-6 border border-gray-600" style={{ animationDelay: '100ms' }}>
+                <h4 className="text-3xl font-bold text-white mb-2">{featuredProjects.length}</h4>
+                <p className="text-gray-300">Featured Projects</p>
+              </div>
+              <div className="slide-in glass rounded-xl p-6 border border-gray-600" style={{ animationDelay: '200ms' }}>
+                <h4 className="text-3xl font-bold text-white mb-2">{new Set(projects.map(p => p.category)).size}</h4>
+                <p className="text-gray-300">Categories</p>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Search and Filter Section */}
         <section className="mb-12">
@@ -252,25 +271,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
           )}
         </section>
 
-        {/* Project Stats */}
-        {projects.length > 0 && (
-          <section className="mt-16 pt-16 border-t border-gray-700">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-              <div className="slide-in glass rounded-xl p-6 border border-gray-600">
-                <h4 className="text-3xl font-bold text-white mb-2">{projects.length}</h4>
-                <p className="text-gray-300">Total Projects</p>
-              </div>
-              <div className="slide-in glass rounded-xl p-6 border border-gray-600" style={{ animationDelay: '100ms' }}>
-                <h4 className="text-3xl font-bold text-white mb-2">{featuredProjects.length}</h4>
-                <p className="text-gray-300">Featured Projects</p>
-              </div>
-              <div className="slide-in glass rounded-xl p-6 border border-gray-600" style={{ animationDelay: '200ms' }}>
-                <h4 className="text-3xl font-bold text-white mb-2">{new Set(projects.map(p => p.category)).size}</h4>
-                <p className="text-gray-300">Categories</p>
-              </div>
-            </div>
-          </section>
-        )}
+       
       </div>
 
       <CustomProjectModal
