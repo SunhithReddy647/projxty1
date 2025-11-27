@@ -84,7 +84,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
         )}
         
         {/* Search and Filter Section */}
-        <section className="mb-12">
+      <section className="mb-12 mt-24">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-6 slide-in">
               <h3 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
