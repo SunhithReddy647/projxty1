@@ -24,7 +24,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   const handleContactClick = () => {
     const message = `Hi! I'm interested in your project "${project.title}". I'd like to know more about it.`;
-    const whatsappUrl = `https://wa.me/916361064550?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/6303459155?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 

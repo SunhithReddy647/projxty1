@@ -321,7 +321,7 @@ function App() {
         </div>
 
         <a
-          href="https://wa.me/916361064550?text=Hi! I'm interested in your projects and would like to connect."
+          href="https://wa.me/6303459155?text=Hi! I'm interested in your projects and would like to connect."
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center justify-center w-14 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 touch-manipulation"
